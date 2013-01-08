@@ -42,9 +42,9 @@ class install(_install):
 					at = os.stat(f) # Store attributes
 
 					if self.install_data:
-						replace_me = os.path.join(self.install_data,'share/chronoslnx')
+						replace_me = os.path.join(self.install_data,'share/qarithmancy')
 					elif self.prefix:
-						replace_me = os.path.join(self.prefix,'share/chronoslnx')
+						replace_me = os.path.join(self.prefix,'share/qarithmancy')
 					if self.root[-1] == '/':
 						consts = [['DATA_DIR', replace_me.replace(self.root[:-2],'')]]
 					else:
