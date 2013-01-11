@@ -1,31 +1,11 @@
 from PyQt4 import QtCore,QtGui
 import os
 
-from .misc import AliasEditorDelegate, DateEditorDelegate
 from .core import NumerologyReport
+from .widgets import NumerologyReportWidget
+from .misc import AliasEditorDelegate, DateEditorDelegate
 from .guiconfig import QArithmancyConfig
 from . import APPNAME,APPVERSION,AUTHOR,DESCRIPTION,YEAR,PAGE,EMAIL
-
-class NumerologyReportWidget(QtGui.QWidget):
-	def __init__(self, first_name, last_name, birth_date, l2nmap, 
-				l2nmapname, middle_name='', parent=None):
-		super().__init__(parent)
-		self.report=NumerologyReport(first_name, last_name, birth_date, 
-									l2nmap, middle_name=middle_name)
-		layout=QtGui.QVBoxLayout(self)
-		label=QtGui.QLabel("Report for {}, born on {} and using the {} letter to number mapping."\
-							.format(self.report.full_name,birth_date,l2nmapname))
-		layout.addWidget(label)
-		
-		basic_report=QtGui.QLabel("Filler")
-		strandweak=QtGui.QLabel("Even more filler")
-		lifeview=QtGui.QLabel("Filler to the max")
-		tabs=QtGui.QTabWidget(self)
-		tabs.addTab(basic_report,"Basics")
-		tabs.addTab(strandweak, "Strengths and Weaknesses")
-		tabs.addTab(lifeview, "Life Overview")
-
-		layout.addWidget(tabs)
 
 class QArithmancy(QtGui.QMainWindow):
 	def __init__(self):
@@ -120,10 +100,10 @@ class QArithmancy(QtGui.QMainWindow):
 		mname=qtrcfg.people.data(qtrcfg.people.index(item.row(), 1), QtCore.Qt.EditRole)
 		lname=qtrcfg.people.data(qtrcfg.people.index(item.row(), 2), QtCore.Qt.EditRole)
 		bdate=qtrcfg.people.data(qtrcfg.people.index(item.row(), 3), QtCore.Qt.UserRole)
-		report=NumerologyReportWidget(fname, lname, bdate.toPyDate(),
-								mapping, self.mappingBox.currentText(), 
-								middle_name=mname, parent=dialog)
-		layout.addWidget(report)
+		report=NumerologyReport(fname, lname, bdate.toPyDate(),
+								mapping, middle_name=mname)
+		reportw=NumerologyReportWidget(report, self.mappingBox.currentText(), parent=dialog)
+		layout.addWidget(reportw)
 		buttonbox=QtGui.QDialogButtonBox(QtCore.Qt.Horizontal)
 		closebutton=buttonbox.addButton(QtGui.QDialogButtonBox.Close)
 		closebutton.clicked.connect(dialog.close)
