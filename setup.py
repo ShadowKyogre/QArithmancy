@@ -54,7 +54,7 @@ class install(_install):
 								 "### CONSTANTS BEGIN ###")
 
 					for const in consts:
-						script.write("\n{} = '{}'".const[0])
+						script.write("\n{} = '{}'".format(const[0],const[1]))
 					script.write("\n" + content[const_end:])
 					script.close()
 
