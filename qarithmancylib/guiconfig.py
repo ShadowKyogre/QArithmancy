@@ -1,29 +1,26 @@
 from PyQt4 import QtGui,QtCore
 import csv
 import os
+from collections import OrderedDict as od
+
+from .core import LetterMapping
+from . import APPNAME, AUTHOR, MAPPINGS
 
 class QArithmancyConfig:
-
-	APPNAME="QArithmancy"
-	APPVERSION="0.1"
-	AUTHOR="ShadowKyogre"
-	DESCRIPTION="A small biorhythm application based on PyQt4."
-	YEAR="2013"
-	PAGE="http://shadowkyogre.github.com/QArithmancy/"
-
 	def __init__(self):
 		self.settings=QtCore.QSettings(QtCore.QSettings.IniFormat,
 						QtCore.QSettings.UserScope,
-						QArithmancyConfig.AUTHOR,
-						QArithmancyConfig.APPNAME)
+						AUTHOR,APPNAME)
 
 		self.userconfdir=QtGui.QDesktopServices.storageLocation\
 		(QtGui.QDesktopServices.DataLocation).replace("//","/")
-		#QtCore.QDir.currentPath()
+		user_mappings=os.path.join(self.userconfdir,"mappings")
 
 		self.sys_icotheme=QtGui.QIcon.themeName()
 		self.reset_settings()
+		QtCore.QDir.setSearchPaths("mappings", [user_mappings, MAPPINGS])
 		self.load_people()
+		self.load_mappings()
 	
 	def reset_settings(self):
 		self.current_icon_override=self.settings.value("stIconTheme", "")
@@ -37,6 +34,15 @@ class QArithmancyConfig:
 
 	def add_delete_update(self, index, start, end):
 		self.save_people()
+	
+	def load_mappings(self):
+		self.mappings=od()
+		mappings_path=QtCore.QDir("mappings:/")
+		for i in mappings_path.entryList():
+			if i in (".",".."):
+				continue
+			mapping=mappings_path.absoluteFilePath(i)
+			self.mappings[os.path.splitext(i)[0].title()]=LetterMapping(mapping)
 
 	def load_people(self):
 		self.people=QtGui.QStandardItemModel()

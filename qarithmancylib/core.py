@@ -1,6 +1,11 @@
+from dateutil.relativedelta import relativedelta
 from datetime import date
 from collections import Counter,UserDict
 import re
+
+# sites I looked at for applicable calculations
+#http://stackoverflow.com/questions/3387691/python-how-to-perfectly-override-a-dict
+#http://www.decoz.com/numerology-Course-21a.htm
 
 CONSONANTS=re.compile("[bcdfghjklmnpqrstvwxyz]",re.I)
 VOWELS=re.compile("[aeiou]",re.I)
@@ -80,11 +85,10 @@ PERIOD_CYCLES={
 		8:[[28,29],[55,56],[float('inf'),float('inf')]],
 		9:[[27,28],[54,55],[float('inf'),float('inf')]],
 }
-PERIOD_CYCLES[11]=period_cycles[2]
-PERIOD_CYCLES[22]=period_cycles[4]
-PERIOD_CYCLES[33]=period_cycles[6]
+PERIOD_CYCLES[11]=PERIOD_CYCLES[2]
+PERIOD_CYCLES[22]=PERIOD_CYCLES[4]
+PERIOD_CYCLES[33]=PERIOD_CYCLES[6]
 
-#http://stackoverflow.com/questions/3387691/python-how-to-perfectly-override-a-dict
 class LetterMapping(LowerTransformedDict):
 	def __init__(self, fname):
 		super().__init__()
@@ -129,7 +133,27 @@ class NumerologyReport:
 		self._subconscious=None
 
 	def transit_cycle_num(self, date):
-		return date
+		physical_cycle=[]
+		spiritual_cycle=[]
+		for c in filter(onlyltrs, self.fname):
+			for i in range(self.l2nmap[c]):
+				physical_cycle.append(c)
+		for c in filter(onlyltrs, self.lname):
+			for i in range(self.l2nmap[c]):
+				spiritual_cycle.append(c)
+		if self.mname == "":
+			mental_cycle=spiritual_cycle
+		else:
+			mental_cycle=[]
+			for c in filter(onlyltrs, self.mname):
+				for i in range(self.l2nmap[c]):
+					mental_cycle.append(c)
+		diffyears=relativedelta(date,self.bdate).years
+		pc=physical_cycle[diffyears%len(physical_cycle)]
+		mc=mental_cycle[diffyears%len(mental_cycle)]
+		sc=spiritual_cycle[diffyears%len(spiritual_cycle)]
+		essence=self.l2nmap[pc]+self.l2nmap[mc]+self.l2nmap[sc]
+		return pc,mc,sc,essence
 
 	@property
 	def life_cycles(self):

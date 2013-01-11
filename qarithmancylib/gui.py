@@ -1,57 +1,31 @@
 from PyQt4 import QtCore,QtGui
 import os
 
-from . import core
+from .misc import AliasEditorDelegate, DateEditorDelegate
+from .core import NumerologyReport
 from .guiconfig import QArithmancyConfig
 from . import APPNAME,APPVERSION,AUTHOR,DESCRIPTION,YEAR,PAGE,EMAIL
 
-class AliasEditorDelegate(QtGui.QStyledItemDelegate):
-	def __init__(self, parent=None, *args):
-		super().__init__(parent, *args)
-	
-	def createEditor(self, parent, option, index):
-		p=QtGui.QLineEdit(parent)
-		p.setAutoFillBackground(True)
-		return p
+class NumerologyReportWidget(QtGui.QWidget):
+	def __init__(self, first_name, last_name, birth_date, l2nmap, 
+				l2nmapname, middle_name='', parent=None):
+		super().__init__(parent)
+		self.report=NumerologyReport(first_name, last_name, birth_date, 
+									l2nmap, middle_name=middle_name)
+		layout=QtGui.QVBoxLayout(self)
+		label=QtGui.QLabel("Report for {}, born on {} and using the {} letter to number mapping."\
+							.format(self.report.full_name,birth_date,l2nmapname))
+		layout.addWidget(label)
+		
+		basic_report=QtGui.QLabel("Filler")
+		strandweak=QtGui.QLabel("Even more filler")
+		lifeview=QtGui.QLabel("Filler to the max")
+		tabs=QtGui.QTabWidget(self)
+		tabs.addTab(basic_report,"Basics")
+		tabs.addTab(strandweak, "Strengths and Weaknesses")
+		tabs.addTab(lifeview, "Life Overview")
 
-	def setEditorData(self, editor, index):
-		value = index.model().data(index, QtCore.Qt.EditRole)
-		if value is None:
-			editor.setText("")
-		else:
-			editor.setText(value)
-
-	def setModelData(self, editor, model, index):
-		model.setData(index, editor.text().split(';'), QtCore.Qt.UserRole)
-		model.setData(index, editor.text(), QtCore.Qt.EditRole)
-		#needs edit twice for some reason?
-
-	def updateEditorGeometry(self, editor, option, index):
-		editor.setGeometry(option.rect)
-
-class DateEditorDelegate(QtGui.QStyledItemDelegate):
-	def __init__(self, parent=None, *args):
-		super().__init__(parent, *args)
-
-	def createEditor(self, parent, option, index):
-		p=QtGui.QDateEdit(parent)
-		p.setDisplayFormat("MM/dd/yyyy")
-		p.setAutoFillBackground(True)
-		return p
-
-	def setEditorData(self, editor, index):
-		value = index.model().data(index, QtCore.Qt.UserRole)
-		if value is None:
-			editor.setDate(QtCore.QDate())
-		else:
-			editor.setDate(value)
-
-	def setModelData(self, editor, model, index):
-		model.setData(index, editor.date(), QtCore.Qt.UserRole)
-		model.setData(index, editor.date().toString("MM/dd/yyyy"), QtCore.Qt.EditRole)
-
-	def updateEditorGeometry(self, editor, option, index):
-		editor.setGeometry(option.rect)
+		layout.addWidget(tabs)
 
 class QArithmancy(QtGui.QMainWindow):
 	def __init__(self):
@@ -100,8 +74,16 @@ class QArithmancy(QtGui.QMainWindow):
 		toolbar.addAction(saveAction)
 		toolbar.addAction(newAction)
 		toolbar.addAction(deleteAction)
-		toolbar.addAction(viewAction)
 		toolbar.addAction(aboutAction)
+		#http://www.ffuts.org/blog/right-aligning-a-button-in-a-qtoolbar/
+		spacer = QtGui.QWidget()
+		spacer.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
+		toolbar.addWidget(spacer)
+		self.mappingBox = QtGui.QComboBox()
+		self.mappingBox.addItems(list(qtrcfg.mappings.keys()))
+		toolbar.addWidget(QtGui.QLabel("Letter to number mapping"))
+		toolbar.addWidget(self.mappingBox)
+		toolbar.addAction(viewAction)
 
 	def about(self):
 		QtGui.QMessageBox.about (self, "About {}".format(APPNAME),
@@ -126,11 +108,27 @@ class QArithmancy(QtGui.QMainWindow):
 
 	def deletePerson(self):
 		item=self.listy.currentIndex()
-		self.tree.model().takeRow(item.row())
+		self.listy.model().takeRow(item.row())
 	
 	def viewPerson(self):
 		item=self.listy.currentIndex()
-		QtGui.QMessageBox.information(self,"a","a")
+		mapping=qtrcfg.mappings[self.mappingBox.currentText()]
+		dialog=QtGui.QDialog(self)
+		layout=QtGui.QVBoxLayout(dialog)
+
+		fname=qtrcfg.people.data(qtrcfg.people.index(item.row(), 0), QtCore.Qt.EditRole)
+		mname=qtrcfg.people.data(qtrcfg.people.index(item.row(), 1), QtCore.Qt.EditRole)
+		lname=qtrcfg.people.data(qtrcfg.people.index(item.row(), 2), QtCore.Qt.EditRole)
+		bdate=qtrcfg.people.data(qtrcfg.people.index(item.row(), 3), QtCore.Qt.UserRole)
+		report=NumerologyReportWidget(fname, lname, bdate.toPyDate(),
+								mapping, self.mappingBox.currentText(), 
+								middle_name=mname, parent=dialog)
+		layout.addWidget(report)
+		buttonbox=QtGui.QDialogButtonBox(QtCore.Qt.Horizontal)
+		closebutton=buttonbox.addButton(QtGui.QDialogButtonBox.Close)
+		closebutton.clicked.connect(dialog.close)
+		layout.addWidget(buttonbox)
+		dialog.show()
 
 	def saveData(self,filename=None):
 		if not filename:
@@ -152,8 +150,8 @@ def main():
 	global qtrcfg
 
 	app = QtGui.QApplication(os.sys.argv)
-	app.setApplicationName(QArithmancyConfig.APPNAME)
-	app.setApplicationVersion(QArithmancyConfig.APPVERSION)
+	app.setApplicationName(APPNAME)
+	app.setApplicationVersion(APPVERSION)
 	qtrcfg = QArithmancyConfig()
 	app.setWindowIcon(QtGui.QIcon.fromTheme(APPNAME.lower()))
 	window = QArithmancy()

@@ -9,3 +9,5 @@ EMAIL="shadowkyogre.public@gmail.com"
 ### CONSTANTS BEGIN ###
 DATA_DIR = path.dirname(path.dirname(__file__))
 ### CONSTANTS END ###
+MAPPINGS=path.join(DATA_DIR,"mappings")
+DEFINITIONS=path.join(DATA_DIR,"definitions")
