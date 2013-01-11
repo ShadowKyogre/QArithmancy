@@ -84,7 +84,7 @@ class QArithmancy(QtGui.QMainWindow):
 		item4.setData(QtCore.QDate(),QtCore.Qt.UserRole)
 		#item5=QtGui.QStandardItem("This is filler text")
 		#item5.setData(["This is filler text"],QtCore.Qt.UserRole)
-		qtrcfg.people.appendRow([item,item2,item3,item4,item5])
+		qtrcfg.people.appendRow([item,item2,item3,item4])
 
 	def deletePerson(self):
 		item=self.listy.currentIndex()
