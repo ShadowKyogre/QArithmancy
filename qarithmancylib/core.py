@@ -103,8 +103,8 @@ class LetterMapping(LowerTransformedDict):
 			else:
 				self.max_num=total
 	def sum_digits(self, number, nomaster=False):
-		if (nomaster and number not in self.valid_nums) or \
-		(number not in self.valid_nums and number not in MASTER_NUMS):
+		if number > 0 and ((nomaster and number not in self.valid_nums) or \
+		(number not in self.valid_nums and number not in MASTER_NUMS)):
 			new_num=sum((int(i) for i in str(number)))
 			return self.sum_digits(new_num,nomaster=nomaster)
 		else:
@@ -210,7 +210,10 @@ class NumerologyReport:
 		return self._challenge_nums
 	def personal_date_nums(self, date):
 		if date not in self._pdate_nums_cache.keys():
-			self._pdate_nums_cache[date]=self.l2nmap.sum_digits(date.year+self.bdate.day+self.bdate.month)
+			self._pdate_nums_cache[date]={}
+			self._pdate_nums_cache[date]['year']=self.l2nmap.sum_digits(date.year+self.bdate.day+self.bdate.month)
+			self._pdate_nums_cache[date]['month']=self.l2nmap.sum_digits(date.month+self._pdate_nums_cache[date]['year'])
+			self._pdate_nums_cache[date]['day']=self.l2nmap.sum_digits(date.day+self._pdate_nums_cache[date]['month'])
 		return self.pdate_nums_cache[date]
 	@property
 	def hidden_passion(self):
@@ -228,7 +231,7 @@ class NumerologyReport:
 	def possible_weaknesses(self):
 			nums=set()
 			max_num=0
-			for c in self.full_name:
+			for c in filter(onlyltrs, self.full_name):
 				nums.add(self.l2nmap[c])
 			return set(self.l2nmap.valid_nums)-nums
 	@property
@@ -253,9 +256,11 @@ class NumerologyReport:
 		n1=self.l2nmap[self.fname[0]]
 		n2=self.l2nmap[self.mname[0]] if self.mname != "" else 0
 		n3=self.l2nmap[self.lname[0]]
+		total=n1+n2+n3
 		return self.l2nmap.sum_digits(total)
 	@property
-	def maturity_num(self):
+	def underlying_goal_num(self):
+		#also known as the maturity number
 		return self.l2nmap.sum_digits(self.life_path_num+self.character_num)
 	@property
 	def capstone_num(self):

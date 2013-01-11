@@ -64,11 +64,11 @@ class install(_install):
 
 data_files = [
 			('share/applications',['QArithmancy.desktop']),
-			('share/qarithmancy',glob.glob('*.txt')),
+			('share/qarithmancy/mappings',glob.glob(os.path.join('mappings','*.txt'))),
 			('share/qarithmancy',glob.glob('people.csv'))
 			 #('share/pixmaps', ['qarithmancy.png']),
 			 ]
-data_files.extend(globby_themes())
+
 
 setup(
 	name = APPNAME,
