@@ -5,20 +5,22 @@ class AliasEditorDelegate(QtGui.QStyledItemDelegate):
 		super().__init__(parent, *args)
 	
 	def createEditor(self, parent, option, index):
-		p=QtGui.QLineEdit(parent)
+		p=QtGui.QComboBox(parent)
 		p.setAutoFillBackground(True)
+		p.setEditable(True)
 		return p
 
 	def setEditorData(self, editor, index):
-		value = index.model().data(index, QtCore.Qt.EditRole)
-		if value is None:
-			editor.setText("")
-		else:
-			editor.setText(value)
+		value = index.model().data(index, QtCore.Qt.UserRole)
+		print(index.row(), index.column())
+		print(value)
+		if value is not None:
+			editor.addItems(value)
 
 	def setModelData(self, editor, model, index):
-		model.setData(index, editor.text().split(';'), QtCore.Qt.UserRole)
-		model.setData(index, editor.text(), QtCore.Qt.EditRole)
+		data = [editor.itemText(i) for i in range(editor.count())]
+		model.setData(index, data, QtCore.Qt.UserRole)
+		model.setData(index, ';'.join(data), QtCore.Qt.EditRole)
 		#needs edit twice for some reason?
 
 	def updateEditorGeometry(self, editor, option, index):

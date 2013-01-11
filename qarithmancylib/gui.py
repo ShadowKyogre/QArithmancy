@@ -17,9 +17,9 @@ class QArithmancy(QtGui.QMainWindow):
 		self.listy.setSortingEnabled(True)
 
 		dateeditor=DateEditorDelegate(self.listy)
-		aliaseditor=AliasEditorDelegate(self.listy)
+		#aliaseditor=AliasEditorDelegate(self.listy)
 		self.listy.setItemDelegateForColumn(3,dateeditor)
-		self.listy.setItemDelegateForColumn(4,aliaseditor)
+		#self.listy.setItemDelegateForColumn(4,aliaseditor)
 
 		exitAction = QtGui.QAction(QtGui.QIcon.fromTheme('application-exit'), 'Exit', self)
 		exitAction.setShortcut('Ctrl+Q')
@@ -82,8 +82,8 @@ class QArithmancy(QtGui.QMainWindow):
 		item3=QtGui.QStandardItem("Missing")
 		item4=QtGui.QStandardItem("01/01/2000")
 		item4.setData(QtCore.QDate(),QtCore.Qt.UserRole)
-		item5=QtGui.QStandardItem("This is filler text")
-		item5.setData(["This is filler text"],QtCore.Qt.UserRole)
+		#item5=QtGui.QStandardItem("This is filler text")
+		#item5.setData(["This is filler text"],QtCore.Qt.UserRole)
 		qtrcfg.people.appendRow([item,item2,item3,item4,item5])
 
 	def deletePerson(self):

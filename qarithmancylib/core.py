@@ -111,13 +111,15 @@ class LetterMapping(LowerTransformedDict):
 			return number
 
 class NumerologyReport:
-	def __init__(self, first_name, last_name, birth_date, l2nmap, middle_name=''):
+	def __init__(self, first_name, last_name, birth_date, 
+				l2nmap, middle_name=''):
 		#properties for calculations
 		self.fname=first_name
 		self.mname=middle_name
 		self.lname=last_name
 		self.bdate=birth_date
 		self.l2nmap=l2nmap
+		self.nicknames=[]
 
 		#properties that are cached
 		self._pdate_nums_cache={}
@@ -131,27 +133,31 @@ class NumerologyReport:
 		self._hidden_passion=None
 		self._weaknesses=None
 		self._subconscious=None
+		self._pcycle=None
+		self._scycle=None
+		self._mcycle=None
 
 	def transit_cycle_num(self, date):
-		physical_cycle=[]
-		spiritual_cycle=[]
-		for c in filter(onlyltrs, self.fname):
-			for i in range(self.l2nmap[c]):
-				physical_cycle.append(c)
-		for c in filter(onlyltrs, self.lname):
-			for i in range(self.l2nmap[c]):
-				spiritual_cycle.append(c)
-		if self.mname == "":
-			mental_cycle=spiritual_cycle
-		else:
-			mental_cycle=[]
-			for c in filter(onlyltrs, self.mname):
+		if self._pcycle is None:
+			self._pcycle=[]
+			self._scycle=[]
+			for c in filter(onlyltrs, self.fname):
 				for i in range(self.l2nmap[c]):
-					mental_cycle.append(c)
+					self._pcycle.append(c)
+			for c in filter(onlyltrs, self.lname):
+				for i in range(self.l2nmap[c]):
+					self._scycle.append(c)
+			if self.mname == "":
+				self._mcycle=self._scycle
+			else:
+				self._mcycle=[]
+				for c in filter(onlyltrs, self.mname):
+					for i in range(self.l2nmap[c]):
+						self._mcycle.append(c)
 		diffyears=relativedelta(date,self.bdate).years
-		pc=physical_cycle[diffyears%len(physical_cycle)]
-		mc=mental_cycle[diffyears%len(mental_cycle)]
-		sc=spiritual_cycle[diffyears%len(spiritual_cycle)]
+		pc=self._pcycle[diffyears%len(self._pcycle)]
+		mc=self._mcycle[diffyears%len(self._mcycle)]
+		sc=self._scycle[diffyears%len(self._scycle)]
 		essence=self.l2nmap[pc]+self.l2nmap[mc]+self.l2nmap[sc]
 		return pc,mc,sc,essence
 
@@ -273,7 +279,7 @@ class NumerologyReport:
 	def first_vowel_num(self):
 		#first vowel of first name is for hint at hearts desire
 		return self.l2nmap[list(filter(lambda x:onlyvwls(x), self.fname))[0]]
-
+'''
 if __name__ == "__main__":
 	import sys
 	if len(sys.argv[1:]) < 2:
@@ -288,3 +294,4 @@ if __name__ == "__main__":
 		print("Heart number:",heart_num(string,mappy))
 		print("Social number:",social_num(string,mappy))
 		print("---")
+'''

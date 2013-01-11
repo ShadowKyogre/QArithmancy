@@ -46,9 +46,9 @@ class QArithmancyConfig:
 
 	def load_people(self):
 		self.people=QtGui.QStandardItemModel()
-		self.people.setColumnCount(5)
+		self.people.setColumnCount(4)
 		self.people.setHorizontalHeaderLabels(["First Name","Middle Name",
-										"Last Name","Birthdate","Alias(es)"])
+										"Last Name","Birthdate"])
 		path=os.path.join(self.userconfdir, 'people.csv')
 
 		if not os.path.exists(path):
@@ -68,20 +68,28 @@ class QArithmancyConfig:
 			second_column=QtGui.QStandardItem()
 			third_column=QtGui.QStandardItem()
 			fourth_column=QtGui.QStandardItem()
-			fifth_column=QtGui.QStandardItem()
+			#fifth_column=QtGui.QStandardItem()
 
 			first_column.setText(entry[0])
 			second_column.setText(entry[1])
 			third_column.setText(entry[2])
 			fourth_column.setText(entry[3])
-			fifth_column.setText(entry[4])
-			fifth_column.setData(entry[4].split(";"))
+			#nicks = tuple(entry[4].split(";"))
+			#print(nicks)
+			#if len(nicks) == 0:
+			#	fifth_column.setText("<No nicknames>")
+			#elif len(nicks) == 1:
+			#	fifth_column.setText(nicks[0])
+			#else:
+			#	fifth_column.setText("{} and {} other nicknames".format(nicks[0],len(nicks[1:])))
+			#fifth_column.setData(nicks)
+			#print(fifth_column.data(QtCore.Qt.UserRole))
 			if QtCore.QDate.fromString(entry[3], "MM/dd/yyyy").isValid():
 				fourth_column.setData(QtCore.QDate.fromString(entry[3], "MM/dd/yyyy"),QtCore.Qt.UserRole)
 			else:
 				fourth_column.setData(QtCore.QDate(),QtCore.Qt.UserRole)
 
-			self.people.appendRow([first_column,second_column,third_column,fourth_column,fifth_column])
+			self.people.appendRow([first_column,second_column,third_column,fourth_column])
 		self.people.rowsInserted.connect(self.add_delete_update)
 		self.people.rowsRemoved.connect(self.add_delete_update)
 		self.people.itemChanged.connect(self.changed_update)
@@ -93,14 +101,14 @@ class QArithmancyConfig:
 		f=open(temppath, "w")
 		planner = csv.writer(f)
 		planner.writerow(["First Name","Middle Name",
-						"Last Name","Birthdate","Alias(es)"])
+						"Last Name","Birthdate"])
 		for i in range(rows):
 			first_column=self.people.item(i,0).text()
 			second_column=self.people.item(i,1).text()
 			third_column=self.people.item(i,2).text()
 			fourth_column=self.people.item(i,3).data(QtCore.Qt.UserRole).toString("MM/dd/yyyy")  #need format like this: %m/%d/%Y
-			fifth_column=self.people.item(i,4).text()
-			planner.writerow([first_column,second_column,third_column,fourth_column,fifth_column])
+			#fifth_column=self.people.item(i,4).text()
+			planner.writerow([first_column,second_column,third_column,fourth_column])
 		f.close()
 		os.remove(path)
 		os.renames(temppath, path)
