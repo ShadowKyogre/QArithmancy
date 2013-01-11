@@ -1,33 +1,23 @@
 from PyQt4 import QtCore,QtGui
+from datetime import date
 from .core import NumerologyReport
 
 class BasicReportWidget(QtGui.QWidget):
 	def __init__(self, report, parent=None):
 		super().__init__(parent)
 		self.report=report
-		layout=QtGui.QGridLayout(self)
-		layout.addWidget(QtGui.QLabel("Life Path:"),0,0)
-		layout.addWidget(QtGui.QLabel(str(self.report.life_path_num)),0,1)
-		layout.addWidget(QtGui.QLabel("Birthday:"),1,0)
-		layout.addWidget(QtGui.QLabel(str(self.report.birth_day_num)),1,1)
-		layout.addWidget(QtGui.QLabel("Character:"),2,0)
-		layout.addWidget(QtGui.QLabel(str(self.report.character_num)),2,1)
-		layout.addWidget(QtGui.QLabel("Social:"),3,0)
-		layout.addWidget(QtGui.QLabel(str(self.report.social_num)),3,1)
-		layout.addWidget(QtGui.QLabel("Heart's Desire:"),4,0)
-		layout.addWidget(QtGui.QLabel(str(self.report.heart_num)),4,1)
-		layout.addWidget(QtGui.QLabel("First Vowel:"),5,0)
-		layout.addWidget(QtGui.QLabel(str(self.report.first_vowel_num)),5,1)
-		layout.addWidget(QtGui.QLabel("Rational Thought:"),6,0)
-		layout.addWidget(QtGui.QLabel(str(self.report.rational_thought_num)),6,1)
-		layout.addWidget(QtGui.QLabel("Balance:"),7,0)
-		layout.addWidget(QtGui.QLabel(str(self.report.balance_num)),7,1)
-		layout.addWidget(QtGui.QLabel("Underlying Goal:"),8,0)
-		layout.addWidget(QtGui.QLabel(str(self.report.underlying_goal_num)),8,1)
-		layout.addWidget(QtGui.QLabel("Capstone:"),9,0)
-		layout.addWidget(QtGui.QLabel(str(self.report.capstone_num)),9,1)
-		layout.addWidget(QtGui.QLabel("Cornerstone:"),10,0)
-		layout.addWidget(QtGui.QLabel(str(self.report.cornerstone_num)),10,1)
+		layout=QtGui.QFormLayout(self)
+		layout.addRow("Life Path:", QtGui.QLabel(str(self.report.life_path_num)))
+		layout.addRow("Birthday:", QtGui.QLabel(str(self.report.birth_day_num)))
+		layout.addRow("Character:", QtGui.QLabel(str(self.report.character_num)))
+		layout.addRow("Social:", QtGui.QLabel(str(self.report.social_num)))
+		layout.addRow("Heart's Desire:", QtGui.QLabel(str(self.report.heart_num)))
+		layout.addRow("First Vowel:", QtGui.QLabel(str(self.report.first_vowel_num)))
+		layout.addRow("Rational Thought:", QtGui.QLabel(str(self.report.rational_thought_num)))
+		layout.addRow("Balance:", QtGui.QLabel(str(self.report.balance_num)))
+		layout.addRow("Underlying Goal:", QtGui.QLabel(str(self.report.underlying_goal_num)))
+		layout.addRow("Capstone:", QtGui.QLabel(str(self.report.capstone_num)))
+		layout.addRow("Cornerstone:", QtGui.QLabel(str(self.report.cornerstone_num)))
 
 class StrengthandWeaknessWidget(QtGui.QWidget):
 	def __init__(self, report, parent=None):
@@ -136,6 +126,42 @@ class LifeSnapshotWidget(QtGui.QWidget):
 	def __init__(self, report, parent=None):
 		super().__init__(parent)
 		self.report=report
+		layout=QtGui.QFormLayout(self)
+		self.dateedit=QtGui.QDateEdit(self)
+		self.dateedit.setDisplayFormat("MM/dd/yyyy")
+		self.dateedit.setCalendarPopup(True)
+		self.dateedit.dateChanged.connect(self.updateDisplay)
+		layout.addRow("Date:", self.dateedit)
+
+		self.pdisplay=QtGui.QLabel()
+		self.mdisplay=QtGui.QLabel()
+		self.sdisplay=QtGui.QLabel()
+		self.edisplay=QtGui.QLabel()
+		layout.addRow("Physical:",self.pdisplay)
+		layout.addRow("Mental:",self.mdisplay)
+		layout.addRow("Spiritual:",self.sdisplay)
+		layout.addRow("Essence:",self.edisplay)
+
+		self.pydisplay=QtGui.QLabel()
+		self.pmdisplay=QtGui.QLabel()
+		self.pddisplay=QtGui.QLabel()
+		layout.addRow("Personal Year:",self.pydisplay)
+		layout.addRow("Personal Month:",self.pmdisplay)
+		layout.addRow("Personal Day:",self.pddisplay)
+
+		self.dateedit.setDate(date.today())
+	def updateDisplay(self, date):
+		date=date.toPyDate()
+		p,m,s,e=self.report.transit_cycle_num(date)
+		self.pdisplay.setText(str(p))
+		self.mdisplay.setText(str(m))
+		self.sdisplay.setText(str(s))
+		self.edisplay.setText(str(e))
+
+		pdatenums=self.report.personal_date_nums(date)
+		self.pydisplay.setText(str(pdatenums["year"]))
+		self.pmdisplay.setText(str(pdatenums["month"]))
+		self.pddisplay.setText(str(pdatenums["day"]))
 
 class NumerologyReportWidget(QtGui.QWidget):
 	def __init__(self, report, l2nmapname, parent=None):

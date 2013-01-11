@@ -211,10 +211,10 @@ class NumerologyReport:
 	def personal_date_nums(self, date):
 		if date not in self._pdate_nums_cache.keys():
 			self._pdate_nums_cache[date]={}
-			self._pdate_nums_cache[date]['year']=self.l2nmap.sum_digits(date.year+self.bdate.day+self.bdate.month)
-			self._pdate_nums_cache[date]['month']=self.l2nmap.sum_digits(date.month+self._pdate_nums_cache[date]['year'])
-			self._pdate_nums_cache[date]['day']=self.l2nmap.sum_digits(date.day+self._pdate_nums_cache[date]['month'])
-		return self.pdate_nums_cache[date]
+			self._pdate_nums_cache[date]['year']=self.l2nmap.sum_digits(date.year+self.bdate.day+self.bdate.month,nomaster=True)
+			self._pdate_nums_cache[date]['month']=self.l2nmap.sum_digits(date.month+self._pdate_nums_cache[date]['year'],nomaster=True)
+			self._pdate_nums_cache[date]['day']=self.l2nmap.sum_digits(date.day+self._pdate_nums_cache[date]['month'],nomaster=True)
+		return self._pdate_nums_cache[date]
 	@property
 	def hidden_passion(self):
 		if self._hidden_passion is None:
