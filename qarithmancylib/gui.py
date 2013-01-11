@@ -1,5 +1,6 @@
 from PyQt4 import QtCore,QtGui
 import os
+from datetime import date
 
 from .core import NumerologyReport
 from .widgets import NumerologyReportWidget
@@ -110,22 +111,59 @@ class QArithmancy(QtGui.QMainWindow):
 		layout.addWidget(buttonbox)
 		dialog.show()
 
-	def saveData(self,filename=None):
+	def saveDataAsTXT(self,filename,sdate,edate):
+		item=self.listy.currentIndex()
+		mapping=qtrcfg.mappings[self.mappingBox.currentText()]
+		fname=qtrcfg.people.data(qtrcfg.people.index(item.row(), 0), QtCore.Qt.EditRole)
+		mname=qtrcfg.people.data(qtrcfg.people.index(item.row(), 1), QtCore.Qt.EditRole)
+		lname=qtrcfg.people.data(qtrcfg.people.index(item.row(), 2), QtCore.Qt.EditRole)
+		bdate=qtrcfg.people.data(qtrcfg.people.index(item.row(), 3), QtCore.Qt.UserRole)
+		report=NumerologyReport(fname, lname, bdate.toPyDate(),
+								mapping, middle_name=mname)
+		report.export(filename,sdate,edate,self.mappingBox.currentText())
+
+	def saveData(self,filename=None,sdate=None,edate=None):
+		if None in (sdate,edate):
+			dialog=QtGui.QDialog(self)
+			layout=QtGui.QVBoxLayout(dialog)
+			form=QtGui.QFormLayout()
+			layout.addLayout(form)
+			sdateinput=QtGui.QDateEdit()
+			edateinput=QtGui.QDateEdit()
+			sdateinput.setDisplayFormat("MM/dd/yyyy")
+			edateinput.setDisplayFormat("MM/dd/yyyy")
+			sdateinput.setDate(date.today())
+			edateinput.setDate(date.today())
+			buttonbox=QtGui.QDialogButtonBox(QtCore.Qt.Horizontal)
+			okbutton=buttonbox.addButton(QtGui.QDialogButtonBox.Ok)
+			form.addRow("Forecast start:",sdateinput)
+			form.addRow("Forecast end:",edateinput)
+			okbutton.clicked.connect(dialog.accept)
+			cancelbutton=buttonbox.addButton(QtGui.QDialogButtonBox.Cancel)
+			cancelbutton.clicked.connect(dialog.reject)
+			layout.addWidget(buttonbox)
+			retcode = dialog.exec()
+			if retcode == QtGui.QDialog.Rejected:
+				return
+			else:
+				edate=edateinput.date().toPyDate()
+				sdate=sdateinput.date().toPyDate()
 		if not filename:
-			filename=QtGui.QFileDialog.getSaveFileName(self, caption="Save Current Reading",
-				filter="Images (%s);;Text (*.txt)" %(' '.join(formats)))
+			filename=QtGui.QFileDialog.getSaveFileName(self, caption="Save Current Report",
+				filter="Text (*.txt)")
+				#filter="Images (%s);;Text (*.txt)" %(' '.join(formats)))
 		if filename:
 			fmt=filename.split(".",1)[-1]
 			if fmt == 'txt':
-				self.saveDataAsTXT(filename)
-			elif "*.{}".format(fmt) in formats:
-				self.saveDataAsIMG(filename,fmt)
+				self.saveDataAsTXT(filename,sdate,edate)
+			#elif "*.{}".format(fmt) in formats:
+			#	self.saveDataAsIMG(filename,fmt)
 			else:
-				QtGui.QMessageBox.critical(self, "Save Current Reading", \
+				QtGui.QMessageBox.critical(self, "Save Current Report", \
 				"Invalid format ({}) specified for {}!".format(fmt,filename))
 
 def main():
-	global formats
+	#global formats
 	global app
 	global qtrcfg
 

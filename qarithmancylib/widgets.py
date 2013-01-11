@@ -47,7 +47,7 @@ class StrengthandWeaknessWidget(QtGui.QWidget):
 		counter=0
 		highlight=QtGui.QPalette().midlight().color()
 		highlight.setAlpha(64)
-		for s in ("physical","emotional","mental","intuitive"):
+		for s in totals.keys():
 			item=QtGui.QTableWidgetItem()
 			if s == area:
 				item.setBackground(QtGui.QBrush(highlight))
@@ -63,7 +63,7 @@ class StrengthandWeaknessWidget(QtGui.QWidget):
 		table2.verticalHeader().hide()
 		table2.horizontalHeader().setResizeMode(QtGui.QHeaderView.Stretch)
 		table2.verticalHeader().setResizeMode(QtGui.QHeaderView.Stretch)
-		for s in ("creative","vacillating","grounded"):
+		for s in totals2.keys():
 			item=QtGui.QTableWidgetItem()
 			if s == area2:
 				item.setBackground(QtGui.QBrush(highlight))
@@ -75,7 +75,6 @@ class StrengthandWeaknessWidget(QtGui.QWidget):
 		table.resizeRowsToContents()
 		table2.resizeRowsToContents()
 		layout.addWidget(table2,5,0,1,2)
-
 
 class LifeViewWidget(QtGui.QWidget):
 	def __init__(self, report, parent=None):
@@ -168,8 +167,9 @@ class NumerologyReportWidget(QtGui.QWidget):
 		super().__init__(parent)
 		self.report=report
 		layout=QtGui.QVBoxLayout(self)
-		label=QtGui.QLabel("Report for {}, born on {} and using the {} letter to number mapping."\
-							.format(self.report.full_name,self.report.bdate,l2nmapname))
+		label=QtGui.QLabel(("Report for {}, born on {} and using"
+							" the {} letter to number mapping.").format(self.report.full_name,
+																		self.report.bdate,l2nmapname))
 		layout.addWidget(label)
 		
 		basic_report=BasicReportWidget(report,parent=self)

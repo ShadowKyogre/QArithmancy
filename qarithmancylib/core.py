@@ -1,6 +1,7 @@
 from dateutil.relativedelta import relativedelta
-from datetime import date
+from datetime import date, timedelta
 from collections import Counter,UserDict
+from collections import OrderedDict as od
 import re
 
 # sites I looked at for applicable calculations
@@ -89,6 +90,10 @@ PERIOD_CYCLES[11]=PERIOD_CYCLES[2]
 PERIOD_CYCLES[22]=PERIOD_CYCLES[4]
 PERIOD_CYCLES[33]=PERIOD_CYCLES[6]
 
+def daterange(start_date, end_date):
+	for n in range(int((end_date - start_date).days)):
+		yield start_date + timedelta(n)
+
 class LetterMapping(LowerTransformedDict):
 	def __init__(self, fname):
 		super().__init__()
@@ -137,6 +142,71 @@ class NumerologyReport:
 		self._scycle=None
 		self._mcycle=None
 
+	def export(self, fname, sdate, edate, mapname):
+		title=("Report for {}, born on {} and using"
+			" the {} letter to number mapping.").format(self.full_name,self.bdate,mapname)
+		with open(fname,'w') as f:
+			lines=[title]
+			lines.append("Basics:")
+			lines.append("\tLife Path: {:d}".format(self.life_path_num))
+			lines.append("\tBirthday: {:d}".format(self.birth_day_num))
+			lines.append("\tCharacter: {:d}".format(self.character_num))
+			lines.append("\tSocial: {:d}".format(self.social_num))
+			lines.append("\tHeart's Desire: {:d}".format(self.heart_num))
+			lines.append("\tFirst Vowel: {:d}".format(self.first_vowel_num))
+			lines.append("\tRational Thought: {:d}".format(self.rational_thought_num))
+			lines.append("\tBalance: {:d}".format(self.balance_num))
+			lines.append("\tUnderlying Goal: {:d}".format(self.underlying_goal_num))
+			lines.append("\tCapstone: {:d}".format(self.capstone_num))
+			lines.append("\tCornerstone: {:d}".format(self.cornerstone_num))
+
+			lines.append("Strengths and Weaknesses:")
+			lines.append("\tHidden Passion: {:d}".format(self.hidden_passion))
+			lines.append("\tSubconscious Self: {:d}".format(self.subconscious_self))
+			lines.append("\tPossible weaknesses: {}".format(self.possible_weaknesses))
+			area,area2,totals,totals2=self.planes_of_expression
+			lines.append("\tMost prominent planes of expression: {}, {}".format(area,area2))
+			lines.append("\tNumbers for planes of expression:")
+			lines.append("\tPlane      |Number")
+			lines.append("\t-----------|------")
+			for n in totals.keys():
+				if n == self._eplane:
+					lines.append("\t{:11}|{:6}".format(n,"*{:d}".format(totals[n])))
+				else:
+					lines.append("\t{:11}|{:6d}".format(n,totals[n]))
+			for n in totals2.keys():
+				if n == self._eplane2:
+					lines.append("\t{:11}|{:6}".format(n,"*{:d}".format(totals2[n])))
+				else:
+					lines.append("\t{:11}|{:6d}".format(n,totals2[n]))
+
+			lines.append("Life Overview:")
+			lines.append("\tChallenges: {}".format(self.challenge_nums))
+			lines.append("\tPinnacles:")
+			lines.append("\tEnd Age|Number")
+			lines.append("\t-------|------")
+			for endage,pinnum in zip(*self.pinnacles):
+				lines.append("\t{:7.0f}|{:6d}".format(endage,pinnum))
+			lines.append("\tLife Cycles:")
+			lines.append("\tEnd Age|Transition Age")
+			lines.append("\t-------|--------------")
+			for endage,transage in self.life_cycles:
+				lines.append("\t{:7.0f}|{:14.0f}".format(endage,transage))
+			if None not in (sdate,edate):
+				lines.append("Life Snapshot for {} to {}:".format(sdate,edate))
+				lines.append(("\tDate      |Physical|Mental|Spiritual|Essence"
+							  "|Personal Year|Personal Month|Personal Day"))
+				lines.append(("\t----------|--------|------|---------|-------"
+							  "|-------------|--------------|------------"))
+				for d in daterange(sdate,edate+timedelta(1)):
+					transits=self.transit_cycle_num(d)
+					pdatenums=self.personal_date_nums(d)
+					stats=[d.strftime("%Y-%m-%d")]
+					stats.extend(transits)
+					stats.extend(pdatenums.values())
+					lines.append("\t{:10}|{:8}|{:6}|{:9}|{:7d}|{:13d}|{:14d}|{:12d}".format(*stats))
+			f.write('\n'.join(lines))
+
 	def transit_cycle_num(self, date):
 		if self._pcycle is None:
 			self._pcycle=[]
@@ -161,6 +231,14 @@ class NumerologyReport:
 		essence=self.l2nmap[pc]+self.l2nmap[mc]+self.l2nmap[sc]
 		return pc,mc,sc,essence
 
+	def personal_date_nums(self, date):
+		if date not in self._pdate_nums_cache.keys():
+			self._pdate_nums_cache[date]={}
+			self._pdate_nums_cache[date]['year']=self.l2nmap.sum_digits(date.year+self.bdate.day+self.bdate.month,nomaster=True)
+			self._pdate_nums_cache[date]['month']=self.l2nmap.sum_digits(date.month+self._pdate_nums_cache[date]['year'],nomaster=True)
+			self._pdate_nums_cache[date]['day']=self.l2nmap.sum_digits(date.day+self._pdate_nums_cache[date]['month'],nomaster=True)
+		return self._pdate_nums_cache[date]
+
 	@property
 	def life_cycles(self):
 		return PERIOD_CYCLES[self.life_path_num]
@@ -178,8 +256,8 @@ class NumerologyReport:
 		if self._eplane is None:
 			c1=Counter([planes_of_expression[c][0] for c in self.full_name if onlyltrs(c)])
 			c2=Counter([planes_of_expression[c][1] for c in self.full_name if onlyltrs(c)])
-			self._eplane3={"physical":0,"emotional":0,"mental":0,"intuitive":0}
-			self._eplane4={"creative":0,"vacillating":0,"grounded":0}
+			self._eplane3=od([("physical",0),("emotional",0),("mental",0),("intuitive",0)])
+			self._eplane4=od([("creative",0),("vacillating",0),("grounded",0)])
 			for c in filter(onlyltrs,self.full_name): 
 				k,k2=planes_of_expression[c]
 				self._eplane3[k]=self.l2nmap.sum_digits(self.l2nmap[c]+self._eplane3[k])
@@ -214,13 +292,7 @@ class NumerologyReport:
 			fourth=self.l2nmap.sum_digits(abs(self.bdate.year-self.bdate.month),nomaster=True)
 			self._challenge_nums=(first,second,third,fourth)
 		return self._challenge_nums
-	def personal_date_nums(self, date):
-		if date not in self._pdate_nums_cache.keys():
-			self._pdate_nums_cache[date]={}
-			self._pdate_nums_cache[date]['year']=self.l2nmap.sum_digits(date.year+self.bdate.day+self.bdate.month,nomaster=True)
-			self._pdate_nums_cache[date]['month']=self.l2nmap.sum_digits(date.month+self._pdate_nums_cache[date]['year'],nomaster=True)
-			self._pdate_nums_cache[date]['day']=self.l2nmap.sum_digits(date.day+self._pdate_nums_cache[date]['month'],nomaster=True)
-		return self._pdate_nums_cache[date]
+
 	@property
 	def hidden_passion(self):
 		if self._hidden_passion is None:
@@ -266,8 +338,9 @@ class NumerologyReport:
 		return self.l2nmap.sum_digits(total)
 	@property
 	def underlying_goal_num(self):
-		#also known as the maturity number
-		return self.l2nmap.sum_digits(self.life_path_num+self.character_num)
+		#also known as the maturity number, where master numbers
+		#aren't included
+		return self.l2nmap.sum_digits(self.life_path_num+self.character_num,nomaster=True)
 	@property
 	def capstone_num(self):
 		#just ltr?
