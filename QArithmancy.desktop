@@ -1,0 +1,11 @@
+[Desktop Entry]
+Exec=qarithmancy.py
+GenericName[en_US]=Comprehensive, lightweight numerology analysis tool
+GenericName=Comprehensive, lightweight numerology analysis tool
+Icon=qarithmancy
+Name[en_US]=QArithmancy
+Name=QArithmancy
+StartupNotify=true
+Terminal=false
+Categories=Application;Accessories;Utility
+Type=Application
