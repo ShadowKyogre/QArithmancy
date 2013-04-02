@@ -12,7 +12,7 @@ CONSONANTS=re.compile("[bcdfghjklmnpqrstvwxyz]",re.I)
 VOWELS=re.compile("[aeiou]",re.I)
 
 MASTER_NUMS={11,22,33}
-PROBLM_NUMS={13,14,16,19}
+PROBLM_NUMS={13,14,16,19} # http://www.decoz.com/Karmic_Debt.htm
 ALLSPECIAL=MASTER_NUMS.union(PROBLM_NUMS)
 #active=[1,4,8]
 #thinking=[2,5,7]
@@ -243,15 +243,15 @@ class NumerologyReport:
 
 	@property
 	def life_cycles(self):
-		return PERIOD_CYCLES[self.life_path_num]
+		return PERIOD_CYCLES[sum_digits(self.life_path_num)]
 
 	@property
 	def birth_day_num(self):
-		return sum_digits(self.bdate.day)
+		return sum_digits(self.bdate.day,special=ALLSPECIAL)
 
 	@property
 	def life_path_num(self):
-		return sum_digits(self.bdate.month+self.bdate.year+self.bdate.day)
+		return sum_digits(self.bdate.month+self.bdate.year+self.bdate.day,special=ALLSPECIAL)
 
 	@property
 	def planes_of_expression(self):
