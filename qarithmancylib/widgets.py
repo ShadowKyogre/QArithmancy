@@ -31,7 +31,7 @@ class StrengthandWeaknessWidget(QtGui.QWidget):
 		layout.addWidget(QtGui.QLabel("Subconscious Self:"),1,0)
 		layout.addWidget(QtGui.QLabel(str(self.report.subconscious_self)),1,1)
 		layout.addWidget(QtGui.QLabel("Possible weaknesses:"),2,0)
-		hbox=QtGui.QHBoxLayout(self)
+		hbox=QtGui.QHBoxLayout()
 		layout.addLayout(hbox,2,1)
 		for i in self.report.possible_weaknesses:
 			hbox.addWidget(QtGui.QLabel(str(i)))
