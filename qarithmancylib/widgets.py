@@ -10,6 +10,7 @@ class BasicReportWidget(QtGui.QWidget):
 		if not forWord:
 			layout.addRow("Life Path:", QtGui.QLabel(str(self.report.life_path_num)))
 			layout.addRow("Birthday:", QtGui.QLabel(str(self.report.birth_day_num)))
+		layout.addRow("Sum of Letters:", QtGui.QLabel(str(self.report.name_sum)))
 		layout.addRow("Character:", QtGui.QLabel(str(self.report.character_num)))
 		layout.addRow("Social:", QtGui.QLabel(str(self.report.social_num)))
 		layout.addRow("Heart's Desire:", QtGui.QLabel(str(self.report.heart_num)))

@@ -315,10 +315,12 @@ class NumerologyReport:
 				nums.add(self.l2nmap[c])
 			return set(self.l2nmap.valid_nums)-nums
 	@property
+	def name_sum(self):
+		return sum((self.l2nmap[c] for c in filter(onlyltrs, self.full_name)))
+	@property
 	def character_num(self):
 		#expression
-		total=sum((self.l2nmap[c] for c in filter(onlyltrs, self.full_name)))
-		return sum_digits(total,special=ALLSPECIAL)
+		return sum_digits(self.name_sum,special=ALLSPECIAL)
 	@property
 	def social_num(self):
 		#personality
