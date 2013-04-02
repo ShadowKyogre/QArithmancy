@@ -12,6 +12,8 @@ CONSONANTS=re.compile("[bcdfghjklmnpqrstvwxyz]",re.I)
 VOWELS=re.compile("[aeiou]",re.I)
 
 MASTER_NUMS={11,22,33}
+PROBLM_NUMS={13,14,16,19}
+ALLSPECIAL=MASTER_NUMS.union(PROBLM_NUMS)
 #active=[1,4,8]
 #thinking=[2,5,7]
 #feeling=[3,6,9]
@@ -94,6 +96,13 @@ def daterange(start_date, end_date):
 	for n in range(int((end_date - start_date).days)):
 		yield start_date + timedelta(n)
 
+def sum_digits(number, special=set()):
+	if number > 9 and not number in special:
+		new_num=sum((int(i) for i in str(number)))
+		return sum_digits(new_num, special=special)
+	else:
+		return number
+
 class LetterMapping(LowerTransformedDict):
 	def __init__(self, fname):
 		super().__init__()
@@ -107,13 +116,6 @@ class LetterMapping(LowerTransformedDict):
 				total+=1
 			else:
 				self.max_num=total
-	def sum_digits(self, number, nomaster=False):
-		if number > 0 and ((nomaster and number not in self.valid_nums) or \
-		(number not in self.valid_nums and number not in MASTER_NUMS)):
-			new_num=sum((int(i) for i in str(number)))
-			return self.sum_digits(new_num,nomaster=nomaster)
-		else:
-			return number
 
 class NumerologyReport:
 	def __init__(self, first_name, last_name, birth_date, 
@@ -234,9 +236,9 @@ class NumerologyReport:
 	def personal_date_nums(self, date):
 		if date not in self._pdate_nums_cache.keys():
 			self._pdate_nums_cache[date]={}
-			self._pdate_nums_cache[date]['year']=self.l2nmap.sum_digits(date.year+self.bdate.day+self.bdate.month,nomaster=True)
-			self._pdate_nums_cache[date]['month']=self.l2nmap.sum_digits(date.month+self._pdate_nums_cache[date]['year'],nomaster=True)
-			self._pdate_nums_cache[date]['day']=self.l2nmap.sum_digits(date.day+self._pdate_nums_cache[date]['month'],nomaster=True)
+			self._pdate_nums_cache[date]['year']=sum_digits(date.year+self.bdate.day+self.bdate.month,special=MASTER_NUMS)
+			self._pdate_nums_cache[date]['month']=sum_digits(date.month+self._pdate_nums_cache[date]['year'],special=MASTER_NUMS)
+			self._pdate_nums_cache[date]['day']=sum_digits(date.day+self._pdate_nums_cache[date]['month'],special=MASTER_NUMS)
 		return self._pdate_nums_cache[date]
 
 	@property
@@ -245,11 +247,11 @@ class NumerologyReport:
 
 	@property
 	def birth_day_num(self):
-		return self.l2nmap.sum_digits(self.bdate.day)
+		return sum_digits(self.bdate.day)
 
 	@property
 	def life_path_num(self):
-		return self.l2nmap.sum_digits(self.bdate.month+self.bdate.year+self.bdate.day)
+		return sum_digits(self.bdate.month+self.bdate.year+self.bdate.day)
 
 	@property
 	def planes_of_expression(self):
@@ -260,8 +262,8 @@ class NumerologyReport:
 			self._eplane4=od([("creative",0),("vacillating",0),("grounded",0)])
 			for c in filter(onlyltrs,self.full_name): 
 				k,k2=planes_of_expression[c]
-				self._eplane3[k]=self.l2nmap.sum_digits(self.l2nmap[c]+self._eplane3[k])
-				self._eplane4[k2]=self.l2nmap.sum_digits(self.l2nmap[c]+self._eplane4[k2])
+				self._eplane3[k]=sum_digits(self.l2nmap[c]+self._eplane3[k])
+				self._eplane4[k2]=sum_digits(self.l2nmap[c]+self._eplane4[k2])
 			self._eplane,self._eplane2=c1.most_common()[0][0],c2.most_common()[0][0]
 		return self._eplane,self._eplane2,self._eplane3,self._eplane4
 	@property
@@ -276,20 +278,20 @@ class NumerologyReport:
 			first=36-self.life_path_num
 			second=first+9
 			third=second+9
-			firstn=self.l2nmap.sum_digits(self.bdate.month+self.bdate.day)
-			secondn=self.l2nmap.sum_digits(self.bdate.year+self.bdate.day)
-			thirdn=self.l2nmap.sum_digits(firstn+secondn)
-			fourthn=self.l2nmap.sum_digits(self.bdate.year+self.bdate.month)
+			firstn=sum_digits(self.bdate.month+self.bdate.day)
+			secondn=sum_digits(self.bdate.year+self.bdate.day)
+			thirdn=sum_digits(firstn+secondn)
+			fourthn=sum_digits(self.bdate.year+self.bdate.month)
 			self._pinnacle_ends=(first,second,third,float('inf'))
 			self._pinnacle_nums=(firstn,secondn,thirdn,fourthn)
 		return self._pinnacle_ends,self._pinnacle_nums
 	@property
 	def challenge_nums(self):
 		if self._challenge_nums is None:
-			first=self.l2nmap.sum_digits(abs(self.bdate.month-self.bdate.day),nomaster=True)
-			second=self.l2nmap.sum_digits(abs(self.bdate.year-self.bdate.day),nomaster=True)
+			first=sum_digits(abs(self.bdate.month-self.bdate.day),special=MASTER_NUMS)
+			second=sum_digits(abs(self.bdate.year-self.bdate.day),special=MASTER_NUMS)
 			third=abs(first-second)
-			fourth=self.l2nmap.sum_digits(abs(self.bdate.year-self.bdate.month),nomaster=True)
+			fourth=sum_digits(abs(self.bdate.year-self.bdate.month),special=MASTER_NUMS)
 			self._challenge_nums=(first,second,third,fourth)
 		return self._challenge_nums
 
@@ -314,33 +316,36 @@ class NumerologyReport:
 			return set(self.l2nmap.valid_nums)-nums
 	@property
 	def character_num(self):
+		#expression
 		total=sum((self.l2nmap[c] for c in filter(onlyltrs, self.full_name)))
-		return self.l2nmap.sum_digits(total)
+		return sum_digits(total,special=ALLSPECIAL)
 	@property
 	def social_num(self):
+		#personality
 		total=sum(self.l2nmap[c] for c in filter(lambda x: onlycnsts(x), self.full_name))
-		return self.l2nmap.sum_digits(total)
+		return sum_digits(total,special=ALLSPECIAL)
 	@property
 	def heart_num(self):
+		#heart's desire
 		total=sum(self.l2nmap[c] for c in filter(lambda x: onlyvwls(x), self.full_name))
-		return self.l2nmap.sum_digits(total)
+		return sum_digits(total,special=ALLSPECIAL)
 	@property
 	def rational_thought_num(self):
 		total=sum((self.l2nmap[c] for c in filter(onlyltrs, self.fname)))
-		other_num=self.l2nmap.sum_digits(total)
-		return self.l2nmap.sum_digits(self.birth_day_num+other_num)
+		other_num=sum_digits(total)
+		return sum_digits(self.birth_day_num+other_num)
 	@property
 	def balance_num(self):
 		n1=self.l2nmap[self.fname[0]]
 		n2=self.l2nmap[self.mname[0]] if self.mname != "" else 0
 		n3=self.l2nmap[self.lname[0]]
 		total=n1+n2+n3
-		return self.l2nmap.sum_digits(total)
+		return sum_digits(total)
 	@property
 	def underlying_goal_num(self):
 		#also known as the maturity number, where master numbers
 		#aren't included
-		return self.l2nmap.sum_digits(self.life_path_num+self.character_num,nomaster=True)
+		return sum_digits(self.life_path_num+self.character_num,special=MASTER_NUMS)
 	@property
 	def capstone_num(self):
 		#just ltr?

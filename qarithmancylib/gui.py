@@ -3,7 +3,7 @@ import os
 from datetime import date
 
 from .core import NumerologyReport
-from .widgets import NumerologyReportWidget
+from .widgets import NumerologyReportWidget, BasicReportWidget
 from .misc import AliasEditorDelegate, DateEditorDelegate
 from .guiconfig import QArithmancyConfig
 from . import APPNAME,APPVERSION,AUTHOR,DESCRIPTION,YEAR,PAGE,EMAIL
@@ -47,6 +47,11 @@ class QArithmancy(QtGui.QMainWindow):
 		viewAction.setStatusTip('View Report for Person')
 		viewAction.triggered.connect(self.viewPerson)
 
+		viewAction2 = QtGui.QAction(QtGui.QIcon.fromTheme('document-open'), 'Inspect a Word', self)
+		viewAction2.setShortcut('Ctrl+Shift+O')
+		viewAction2.setStatusTip('Inspect a Word')
+		viewAction2.triggered.connect(self.viewWord)
+
 		aboutAction=QtGui.QAction(QtGui.QIcon.fromTheme('help-about'), 'About', self)
 		aboutAction.triggered.connect(self.about)
 
@@ -65,6 +70,7 @@ class QArithmancy(QtGui.QMainWindow):
 		toolbar.addWidget(QtGui.QLabel("Letter to number mapping"))
 		toolbar.addWidget(self.mappingBox)
 		toolbar.addAction(viewAction)
+		toolbar.addAction(viewAction2)
 
 	def about(self):
 		QtGui.QMessageBox.about (self, "About {}".format(APPNAME),
@@ -91,6 +97,29 @@ class QArithmancy(QtGui.QMainWindow):
 		item=self.listy.currentIndex()
 		self.listy.model().takeRow(item.row())
 	
+	def viewWord(self):
+		item=self.listy.currentIndex()
+		mapping=qtrcfg.mappings[self.mappingBox.currentText()]
+		dialog=QtGui.QDialog(self)
+		layout=QtGui.QVBoxLayout(dialog)
+
+		fname,letsgo=QtGui.QInputDialog.getText(self, "Type a word to inspect","Word:")
+		mname=''
+		lname=''
+		bdate=None
+		if not letsgo:
+			return
+		report=NumerologyReport(fname, lname, bdate,
+								mapping, middle_name=mname)
+		reportw=BasicReportWidget(report, parent=dialog, forWord=True)
+		layout.addWidget(reportw)
+		buttonbox=QtGui.QDialogButtonBox(QtCore.Qt.Horizontal)
+		closebutton=buttonbox.addButton(QtGui.QDialogButtonBox.Close)
+		closebutton.clicked.connect(dialog.close)
+		layout.addWidget(buttonbox)
+		dialog.setWindowTitle("Report for {}".format(report.full_name))
+		dialog.show()
+
 	def viewPerson(self):
 		item=self.listy.currentIndex()
 		mapping=qtrcfg.mappings[self.mappingBox.currentText()]
@@ -109,6 +138,7 @@ class QArithmancy(QtGui.QMainWindow):
 		closebutton=buttonbox.addButton(QtGui.QDialogButtonBox.Close)
 		closebutton.clicked.connect(dialog.close)
 		layout.addWidget(buttonbox)
+		dialog.setWindowTitle("Report for {}".format(report.full_name))
 		dialog.show()
 
 	def saveDataAsTXT(self,filename,sdate,edate):

@@ -1,23 +1,25 @@
 from PyQt4 import QtCore,QtGui
 from datetime import date
-from .core import NumerologyReport
+#from .core import NumerologyReport
 
 class BasicReportWidget(QtGui.QWidget):
-	def __init__(self, report, parent=None):
+	def __init__(self, report, parent=None, forWord=False):
 		super().__init__(parent)
 		self.report=report
 		layout=QtGui.QFormLayout(self)
-		layout.addRow("Life Path:", QtGui.QLabel(str(self.report.life_path_num)))
-		layout.addRow("Birthday:", QtGui.QLabel(str(self.report.birth_day_num)))
+		if not forWord:
+			layout.addRow("Life Path:", QtGui.QLabel(str(self.report.life_path_num)))
+			layout.addRow("Birthday:", QtGui.QLabel(str(self.report.birth_day_num)))
 		layout.addRow("Character:", QtGui.QLabel(str(self.report.character_num)))
 		layout.addRow("Social:", QtGui.QLabel(str(self.report.social_num)))
 		layout.addRow("Heart's Desire:", QtGui.QLabel(str(self.report.heart_num)))
-		layout.addRow("First Vowel:", QtGui.QLabel(str(self.report.first_vowel_num)))
-		layout.addRow("Rational Thought:", QtGui.QLabel(str(self.report.rational_thought_num)))
-		layout.addRow("Balance:", QtGui.QLabel(str(self.report.balance_num)))
-		layout.addRow("Underlying Goal:", QtGui.QLabel(str(self.report.underlying_goal_num)))
-		layout.addRow("Capstone:", QtGui.QLabel(str(self.report.capstone_num)))
-		layout.addRow("Cornerstone:", QtGui.QLabel(str(self.report.cornerstone_num)))
+		if not forWord:
+			layout.addRow("First Vowel:", QtGui.QLabel(str(self.report.first_vowel_num)))
+			layout.addRow("Rational Thought:", QtGui.QLabel(str(self.report.rational_thought_num)))
+			layout.addRow("Balance:", QtGui.QLabel(str(self.report.balance_num)))
+			layout.addRow("Underlying Goal:", QtGui.QLabel(str(self.report.underlying_goal_num)))
+			layout.addRow("Capstone:", QtGui.QLabel(str(self.report.capstone_num)))
+			layout.addRow("Cornerstone:", QtGui.QLabel(str(self.report.cornerstone_num)))
 
 class StrengthandWeaknessWidget(QtGui.QWidget):
 	def __init__(self, report, parent=None):
