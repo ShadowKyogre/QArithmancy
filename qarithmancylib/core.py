@@ -11,8 +11,8 @@ import re
 CONSONANTS=re.compile("[bcdfghjklmnpqrstvwxyz]",re.I)
 VOWELS=re.compile("[aeiou]",re.I)
 
-MASTER_NUMS={11,22,33}
-PROBLM_NUMS={13,14,16,19} # http://www.decoz.com/Karmic_Debt.htm
+MASTER_NUMS=frozenset([11,22,33])
+PROBLM_NUMS=frozenset([13,14,16,19]) # http://www.decoz.com/Karmic_Debt.htm
 ALLSPECIAL=MASTER_NUMS.union(PROBLM_NUMS)
 #active=[1,4,8]
 #thinking=[2,5,7]
@@ -96,7 +96,10 @@ def daterange(start_date, end_date):
 	for n in range(int((end_date - start_date).days)):
 		yield start_date + timedelta(n)
 
-def sum_digits(number, special=set()):
+sumdcache={}
+def sum_digits(number, special=frozenset()):
+	if sumdcache.get((number,special)) is not None:
+		return sumdcache.get((number,special))
 	if number > 9 and not number in special:
 		new_num=sum((int(i) for i in str(number)))
 		return sum_digits(new_num, special=special)
@@ -312,10 +315,7 @@ class NumerologyReport:
 		return self._subconscious
 	@property
 	def possible_weaknesses(self):
-			nums=set()
-			max_num=0
-			for c in filter(onlyltrs, self.full_name):
-				nums.add(self.l2nmap[c])
+			nums=set((self.l2nmap[c] for c in filter(onlyltrs, self.full_name)))
 			return set(self.l2nmap.valid_nums)-nums
 	@property
 	def name_sum(self):
