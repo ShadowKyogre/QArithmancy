@@ -190,6 +190,9 @@ class NumerologyReport:
 			for endage,pinnum in zip(*self.pinnacles):
 				lines.append("\t{:7.0f}|{:6d}".format(endage,pinnum))
 			lines.append("\tLife Cycles:")
+			lines.append("\t(The first cycle's effects are based on your month.")
+			lines.append("\tThe second cycle's effects are based on your day of birth.")
+			lines.append("\tThe third cycle's effects are based on your year of birth.)")
 			lines.append("\tEnd Age|Transition Age")
 			lines.append("\t-------|--------------")
 			for endage,transage in self.life_cycles:

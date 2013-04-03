@@ -91,7 +91,11 @@ class LifeViewWidget(QtGui.QWidget):
 			layout.addWidget(QtGui.QLabel(str(i)),0,counter)
 			counter+=1
 		layout.addWidget(QtGui.QLabel("Pinnacles:"),1,0,1,3)
-		layout.addWidget(QtGui.QLabel("Life Cycle:"),1,3,1,3)
+		lclabel=QtGui.QLabel("Life Cycle:")
+		lclabel.setToolTip("The first cycle's effects are based on your month.\n"
+							"The second cycle's effects are based on your day of birth.\n"
+							"The third cycle's effects are based on your year of birth.")
+		layout.addWidget(lclabel,1,3,1,3)
 		table=QtGui.QTableWidget(self)
 		layout.addWidget(table,2,0,1,3)
 		table.setColumnCount(4)

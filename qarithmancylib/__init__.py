@@ -1,6 +1,6 @@
 from os import path
 APPNAME="QArithmancy"
-APPVERSION="0.1.3"
+APPVERSION="0.1.4"
 AUTHOR="ShadowKyogre"
 DESCRIPTION="Comprehensive numerology application using PyQt."
 YEAR="2013"
