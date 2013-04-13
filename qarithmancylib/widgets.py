@@ -15,12 +15,12 @@ class BasicReportWidget(QtGui.QWidget):
 		layout.addRow("Social:", QtGui.QLabel(str(self.report.social_num)))
 		layout.addRow("Heart's Desire:", QtGui.QLabel(str(self.report.heart_num)))
 		if not forWord:
-			layout.addRow("First Vowel:", QtGui.QLabel(str(self.report.first_vowel_num)))
 			layout.addRow("Rational Thought:", QtGui.QLabel(str(self.report.rational_thought_num)))
 			layout.addRow("Balance:", QtGui.QLabel(str(self.report.balance_num)))
 			layout.addRow("Underlying Goal:", QtGui.QLabel(str(self.report.underlying_goal_num)))
-			layout.addRow("Capstone:", QtGui.QLabel(str(self.report.capstone_num)))
-			layout.addRow("Cornerstone:", QtGui.QLabel(str(self.report.cornerstone_num)))
+			layout.addRow("First Vowel:", QtGui.QLabel(self.report.first_vowel_num))
+			layout.addRow("Capstone:", QtGui.QLabel(self.report.capstone_num))
+			layout.addRow("Cornerstone:", QtGui.QLabel(self.report.cornerstone_num))
 
 class StrengthandWeaknessWidget(QtGui.QWidget):
 	def __init__(self, report, parent=None):

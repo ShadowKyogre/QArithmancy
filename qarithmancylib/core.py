@@ -354,14 +354,14 @@ class NumerologyReport:
 	@property
 	def capstone_num(self):
 		#just ltr?
-		return self.l2nmap[self.fname[0]]
+		return self.fname[0]
 	@property
 	def cornerstone_num(self):
-		return self.l2nmap[self.fname[-1]]
+		return self.fname[-1]
 	@property
 	def first_vowel_num(self):
 		#first vowel of first name is for hint at hearts desire
-		return self.l2nmap[list(filter(lambda x:onlyvwls(x), self.fname))[0]]
+		return list(filter(lambda x:onlyvwls(x), self.fname))[0]
 '''
 if __name__ == "__main__":
 	import sys
