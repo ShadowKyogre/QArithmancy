@@ -158,10 +158,10 @@ class NumerologyReport:
 			lines.append("\tCharacter: {:d}".format(self.character_num))
 			lines.append("\tSocial: {:d}".format(self.social_num))
 			lines.append("\tHeart's Desire: {:d}".format(self.heart_num))
-			lines.append("\tFirst Vowel: {:d}".format(self.first_vowel_num))
 			lines.append("\tRational Thought: {:d}".format(self.rational_thought_num))
 			lines.append("\tBalance: {:d}".format(self.balance_num))
 			lines.append("\tUnderlying Goal: {:d}".format(self.underlying_goal_num))
+			lines.append("\tFirst Vowel: {:d}".format(self.first_vowel_num))
 			lines.append("\tCapstone: {:d}".format(self.capstone_num))
 			lines.append("\tCornerstone: {:d}".format(self.cornerstone_num))
 
