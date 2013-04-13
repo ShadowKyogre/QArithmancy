@@ -161,9 +161,9 @@ class NumerologyReport:
 			lines.append("\tRational Thought: {:d}".format(self.rational_thought_num))
 			lines.append("\tBalance: {:d}".format(self.balance_num))
 			lines.append("\tUnderlying Goal: {:d}".format(self.underlying_goal_num))
-			lines.append("\tFirst Vowel: {:d}".format(self.first_vowel_num))
-			lines.append("\tCapstone: {:d}".format(self.capstone_num))
-			lines.append("\tCornerstone: {:d}".format(self.cornerstone_num))
+			lines.append("\tFirst Vowel: {}".format(self.first_vowel_num))
+			lines.append("\tCapstone: {}".format(self.capstone_num))
+			lines.append("\tCornerstone: {}".format(self.cornerstone_num))
 
 			lines.append("Strengths and Weaknesses:")
 			lines.append("\tHidden Passion: {:d}".format(self.hidden_passion))
