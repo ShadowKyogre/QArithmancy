@@ -65,8 +65,8 @@ class install(_install):
 data_files = [
 			('share/applications',['QArithmancy.desktop']),
 			('share/qarithmancy/mappings',glob.glob(os.path.join('mappings','*.txt'))),
-			('share/qarithmancy',glob.glob('people.csv'))
-			 #('share/pixmaps', ['qarithmancy.png']),
+			('share/qarithmancy',glob.glob('people.csv')),
+			('share/icons/hicolor/scalable/apps', ['qarithmancy.svg']),
 			 ]
 
 
