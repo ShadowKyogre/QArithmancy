@@ -253,7 +253,7 @@ class NumerologyReport:
 
 	@property
 	def birth_day_num(self):
-		return sum_digits(self.bdate.day,special=ALLSPECIAL)
+		return self.bdate.day
 
 	@property
 	def life_path_num(self):
