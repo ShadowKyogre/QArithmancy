@@ -80,6 +80,7 @@ setup(
 	author_email = EMAIL,
 	description = DESCRIPTION,
 	url = PAGE,
+	license = "GPLv3",
 	packages = ['qarithmancylib'],
 	cmdclass={'install': install},
 	data_files = data_files,
