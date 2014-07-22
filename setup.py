@@ -45,7 +45,10 @@ class install(_install):
 						replace_me = os.path.join(self.install_data,'share/qarithmancy')
 					elif self.prefix:
 						replace_me = os.path.join(self.prefix,'share/qarithmancy')
-					if self.root[-1] == '/':
+
+					if self.root == None:
+						consts = [['DATA_DIR', replace_me.replace(os.sep,'/')]]
+					elif self.root[-1] == '/':
 						consts = [['DATA_DIR', replace_me.replace(self.root[:-2],'')]]
 					else:
 						consts = [['DATA_DIR', replace_me.replace(self.root,'')]]
