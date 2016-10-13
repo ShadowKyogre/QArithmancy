@@ -4,7 +4,7 @@ import os
 from collections import OrderedDict as od
 
 from .core import LetterMapping
-from . import APPNAME, AUTHOR, MAPPINGS
+from . import APPNAME, AUTHOR, MAPPINGS, DATA_DIR
 
 class QArithmancyConfig:
     def __init__(self):
@@ -12,8 +12,9 @@ class QArithmancyConfig:
                         QtCore.QSettings.UserScope,
                         AUTHOR,APPNAME)
 
-        self.userconfdir=QtGui.QDesktopServices.storageLocation\
-        (QtGui.QDesktopServices.DataLocation).replace("//","/")
+        self.userconfdir = QtGui.QDesktopServices.storageLocation(
+            QtGui.QDesktopServices.DataLocation
+        ).replace("//", "/")
         user_mappings=os.path.join(self.userconfdir,"mappings")
 
         self.sys_icotheme=QtGui.QIcon.themeName()
@@ -49,14 +50,14 @@ class QArithmancyConfig:
         self.people.setColumnCount(4)
         self.people.setHorizontalHeaderLabels(["First Name","Middle Name",
                                         "Last Name","Birthdate"])
-        path=os.path.join(self.userconfdir, 'people.csv')
+        path = os.path.join(self.userconfdir, 'people.csv')
 
         if not os.path.exists(path):
             if not os.path.exists(path.replace("people.csv","")):
                 print("Making directory to store people")
                 os.makedirs(self.userconfdir)
             from shutil import copyfile
-            sch=os.path.join(os.sys.path[0],"people.csv")
+            sch=os.path.join(DATA_DIR, "people.csv")
             copyfile(sch, path)
         planner = csv.reader(open(path, "r"))
         next(planner)
